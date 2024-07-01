@@ -15,14 +15,12 @@ import (
 	"sync"
 )
 
-// Function to generate numbers from 2 upwards
 func numberGenerator(ch chan int) {
 	for i := 2; ; i++ {
 		ch <- i
 	}
 }
 
-// Function to check if a number is prime
 func isPrime(n int) bool {
 	if n < 2 {
 		return false
@@ -35,7 +33,6 @@ func isPrime(n int) bool {
 	return true
 }
 
-// Function to process numbers and send primes to results channel
 func primeWorker(ch <-chan int, results chan<- int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for num := range ch {
@@ -50,17 +47,14 @@ func main() {
 	resultsCh := make(chan int)
 	var wg sync.WaitGroup
 
-	// Start number generator
 	go numberGenerator(numCh)
 
-	// Start multiple worker goroutines
 	numWorkers := 5
 	for i := 0; i < numWorkers; i++ {
 		wg.Add(1)
 		go primeWorker(numCh, resultsCh, &wg)
 	}
 
-	// Start a goroutine to close resultsCh when all workers are done
 	go func() {
 		wg.Wait()
 		close(resultsCh)
